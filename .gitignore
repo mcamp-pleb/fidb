@@ -26,6 +26,10 @@
 *.a
 *.lib
 
+# Directories
+.vscode/*
+bin/*
+
 # Executables
 *.exe
 *.out
