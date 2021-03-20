@@ -4,9 +4,9 @@ Terminal based program that records, edits, and displays financial transaction f
 
 ### Requirements
 
-c++17
-g++
-makefile
+* c++17
+* g++
+* makefile
 
 ### Compile
 
