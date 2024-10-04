@@ -168,33 +168,36 @@ void IOData::writeEntry(const Entry &entry, std::ofstream &writeFile)
 
 void IOData::readEntry(Entry &entry, std::ifstream &readFile)
 {
-	//Temp string to format strings as hardcoded 50 characters
-	std::string vendor = "";
-	std::string order = "";
-	std::string description = "";
-	unsigned int id = 0;
-	unsigned int year = 0;
-	unsigned int month = 0;
-	double price = 0.0;
-	size_t strSize = 0;
-	
-	//Store data as ID,Year,Month,Price,Vendor,Order#,Description
-	readFile.read(reinterpret_cast<char*>(&id), sizeof(id));
-	readFile.read(reinterpret_cast<char*>(&year), sizeof(year));
-	readFile.read(reinterpret_cast<char*>(&month), sizeof(month));
-	readFile.read(reinterpret_cast<char*>(&price), sizeof(price));
-	
-	readFile.read(reinterpret_cast<char*>(&strSize),sizeof(strSize));
-	vendor.resize(strSize);
-	readFile.read(&vendor.front(),strSize);
-	readFile.read(reinterpret_cast<char*>(&strSize),sizeof(strSize));
-	order.resize(strSize);
-	readFile.read(&order.front(),strSize);
-	readFile.read(reinterpret_cast<char*>(&strSize),sizeof(strSize));
-	description.resize(strSize);
-	readFile.read(&description.front(),strSize);
+	if(readFile.peek() != EOF)
+	{
+		//Temp string to format strings as hardcoded 50 characters
+		std::string vendor = "";
+		std::string order = "";
+		std::string description = "";
+		unsigned int id = 0;
+		unsigned int year = 0;
+		unsigned int month = 0;
+		double price = 0.0;
+		size_t strSize = 0;
 
-	entry.appendEntry(year, month, price, id, vendor, description, order);
+		//Store data as ID,Year,Month,Price,Vendor,Order#,Description
+		readFile.read(reinterpret_cast<char*>(&id), sizeof(id));
+		readFile.read(reinterpret_cast<char*>(&year), sizeof(year));
+		readFile.read(reinterpret_cast<char*>(&month), sizeof(month));
+		readFile.read(reinterpret_cast<char*>(&price), sizeof(price));
+
+		readFile.read(reinterpret_cast<char*>(&strSize),sizeof(strSize));
+		vendor.resize(strSize);
+		readFile.read(&vendor.front(),strSize);
+		readFile.read(reinterpret_cast<char*>(&strSize),sizeof(strSize));
+		order.resize(strSize);
+		readFile.read(&order.front(),strSize);
+		readFile.read(reinterpret_cast<char*>(&strSize),sizeof(strSize));
+		description.resize(strSize);
+		readFile.read(&description.front(),strSize);
+
+		entry.appendEntry(year, month, price, id, vendor, description, order);
+	}
 }
 
 void IOData::editEntry(const HandleType &handle, const unsigned int &id, const std::string &dir,

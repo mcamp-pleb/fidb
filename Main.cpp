@@ -5,7 +5,7 @@
 #include "IOData.hpp"
 #include "Entry.hpp"
 
-const float PROGRAM_VER = 1.02f;
+const float PROGRAM_VER = 1.03f;
 const int ARGUMENT_SIZE = 50;
 
 void default_info();
