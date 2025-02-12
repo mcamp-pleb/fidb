@@ -2,10 +2,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <chrono>
 #include "IOData.hpp"
 #include "Entry.hpp"
 
-const float PROGRAM_VER = 1.03f;
+const float PROGRAM_VER = 1.04f;
 const int ARGUMENT_SIZE = 50;
 
 void default_info();
@@ -23,6 +24,8 @@ void formatEntrySearchParam(Entry &entry, std::vector<std::string>::iterator &ve
 	const std::vector<std::string>::iterator &end);
 bool isNextParam(const std::vector<std::string>::iterator &param,
 				const std::vector<std::string>::iterator &last);
+void printCurrentStats(const std::string &dir);
+std::vector<std::string> injectCurrentTimeframe();
 
 int main(int argc, char *argv[])
 {
@@ -101,6 +104,10 @@ int main(int argc, char *argv[])
 				{
 					printStats(filePath, i, argstr.end());
 				}
+				else if(*i == "-c" || *i == "--current")
+				{
+					printCurrentStats(filePath);
+				}
 			}
 		}
 	}
@@ -122,11 +129,12 @@ void help_page()
 	std::cout << "Digital checkbook for transaction records" << std::endl << std::endl;
 	std::cout << "[OPTIONS]" << std::endl;
 	std::cout << "  -a, --add\t" << "Adds a new entry" << std::endl;
+	std::cout << "  -c, --current\t" << "Lists entries for the current year and month" << std::endl;
 	std::cout << "  -e, --edit\t" << "Edits an existing entry" << std::endl;
 	std::cout << "  -h, --help\t" << "You are already here <--" << std::endl;
-	std::cout << "  -l, --list\t" << "lists entries" << std::endl;
+	std::cout << "  -l, --list\t" << "Lists entries" << std::endl;
 	std::cout << "  -n, --new\t" << "Creates a new fidb database file" << std::endl;
-	std::cout << "  -r, --remove\t" << "removes an entry" << std::endl;
+	std::cout << "  -r, --remove\t" << "Removes an entry" << std::endl;
 	std::cout << "  -v, --version\t" << "Prints application version" << std::endl << std::endl;
 	std::cout << "[SUB-OPTIONS] -- Can only be used with edit, list, and remove(i= only)" 
 		<< std::endl;
@@ -267,4 +275,31 @@ void formatEntrySearchParam(Entry &entry, std::vector<std::string>::iterator &ve
 	entry.setVendor(vend);
 	entry.setOrderNum(ord);
 	entry.setDescription(des);
+}
+
+//For some reason I need to assign the replacementVec.begin() func to an
+//iterator object. Passing directly to the printStats() func does not work.
+void printCurrentStats(const std::string &dir)
+{
+	std::vector<std::string> replacementVec = injectCurrentTimeframe();
+	std::vector<std::string>::iterator i = replacementVec.begin();
+	printStats(dir, i, replacementVec.end());
+}
+
+//Get the current date using chrono system_clock and convert into a tm struct to extract the year and month.
+//I wish there was a better way to do this.
+//Returns a vector that substitutes the original string of args; needs to include the first arg "-l" since it is
+//normally skipped over.
+std::vector<std::string> injectCurrentTimeframe()
+{
+	std::vector<std::string> timeframe;
+	auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	std::tm local_tm = *std::localtime(&now);
+
+	timeframe.push_back("-l");
+	timeframe.push_back("y=" + std::to_string(local_tm.tm_year + 1900));
+	timeframe.push_back("m=" + std::to_string(local_tm.tm_mon + 1));
+
+
+	return timeframe;
 }
